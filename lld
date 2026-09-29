@@ -1,0 +1,727 @@
+📘 LLD — College Attendance Management System
+1. Backend Folder Structure
+
+This section explains how we organize the backend code.
+
+backend/
+├── server.js
+├── .env
+├── package.json
+├── config/
+│   └── db.js
+├── routes/
+│   ├── authRoutes.js
+│   ├── lectureRoutes.js
+│   └── attendanceRoutes.js
+├── controllers/
+│   ├── authController.js
+│   ├── lectureController.js
+│   └── attendanceController.js
+├── middleware/
+│   ├── authMiddleware.js
+│   └── roleMiddleware.js
+└── services/
+    └── attendanceService.js
+What does each folder do?
+
+Folder/File
+
+	
+
+Purpose
+
+
+
+
+server.js
+
+	
+
+Starts the Express server
+
+
+
+
+config/db.js
+
+	
+
+Connects to MySQL
+
+
+
+
+routes/
+
+	
+
+Defines API URLs
+
+
+
+
+controllers/
+
+	
+
+Handles API requests and responses
+
+
+
+
+middleware/
+
+	
+
+Authentication and role checks
+
+
+
+
+services/
+
+	
+
+Business logic
+
+
+
+
+.env
+
+	
+
+Stores configuration and secrets
+
+Example:
+
+When a teacher saves attendance:
+
+Route → Middleware → Controller → Service → Database
+
+We will implement these files later, one step at a time.
+
+2. Database Tables
+
+This is one of the most important parts of the LLD.
+
+It explains what tables we need in MySQL.
+
+Table 1: users
+
+Stores students and teachers.
+
+Column
+
+	
+
+Example
+
+
+
+
+id
+
+	
+
+1
+
+
+
+
+name
+
+	
+
+Sahil
+
+
+
+
+email
+
+	
+
+sahil@example.com
+
+
+
+
+password
+
+	
+
+Hashed password
+
+
+
+
+role
+
+	
+
+student / teacher
+
+Purpose: Store login and user information.
+
+Table 2: lectures
+
+Stores the fixed lecture schedule.
+
+id
+
+	
+
+lecture_number
+
+	
+
+start_time
+
+	
+
+end_time
+
+
+
+
+1
+
+	
+
+1
+
+	
+
+09:00
+
+	
+
+10:00
+
+
+
+
+2
+
+	
+
+2
+
+	
+
+10:00
+
+	
+
+11:00
+
+
+
+
+3
+
+	
+
+3
+
+	
+
+11:00
+
+	
+
+12:00
+
+Purpose: Store Lecture 1, Lecture 2, Lecture 3, and their timings.
+
+Table 3: attendance
+
+Stores attendance records.
+
+Column
+
+	
+
+Example
+
+
+
+
+id
+
+	
+
+1
+
+
+
+
+student_id
+
+	
+
+5
+
+
+
+
+lecture_id
+
+	
+
+1
+
+
+
+
+attendance_date
+
+	
+
+2026-09-25
+
+
+
+
+status
+
+	
+
+present
+
+
+
+
+marked_by
+
+	
+
+2
+
+Purpose: Store which student was present or absent in which lecture and on what date.
+
+How tables are connected
+users
+
+id (Primary Key)
+
+name, email, role
+
+attendance
+
+student_id → users.id
+
+lecture_id → lectures.id
+
+status, attendance_date
+
+lectures
+
+id (Primary Key)
+
+lecture_number, start_time, end_time
+
+This means the attendance table connects a student to a scheduled lecture.
+
+3. API Endpoints
+
+LLD explains which APIs the backend will provide.
+
+Method
+
+	
+
+Endpoint
+
+	
+
+Who can access?
+
+
+
+
+POST
+
+	
+
+/api/auth/signup
+
+	
+
+Public
+
+
+
+
+POST
+
+	
+
+/api/auth/signin
+
+	
+
+Public
+
+
+
+
+GET
+
+	
+
+/api/auth/profile
+
+	
+
+Logged-in user
+
+
+
+
+GET
+
+	
+
+/api/lectures
+
+	
+
+Student + Teacher
+
+
+
+
+POST
+
+	
+
+/api/attendance
+
+	
+
+Teacher
+
+
+
+
+PUT
+
+	
+
+/api/attendance/:id
+
+	
+
+Teacher
+
+
+
+
+GET
+
+	
+
+/api/attendance/me
+
+	
+
+Student
+
+
+
+
+GET
+
+	
+
+/api/attendance/report
+
+	
+
+Teacher
+
+Example: Mark Attendance API
+POST /api/attendance
+
+Request body:
+
+{
+  "student_id": 1,
+  "lecture_id": 2,
+  "attendance_date": "2026-09-25",
+  "status": "present"
+}
+
+The backend will validate the request, check the teacher's authorization, and save the attendance record.
+
+Important: The teacher ID should come from the verified JWT rather than being trusted from the request body.
+
+4. Authentication Flow
+
+This section explains how login works.
+
+Student or teacher sends email and password.
+Backend searches for the user in MySQL.
+
+bcrypt.compare() checks the password.
+
+Backend generates a JWT token.
+Frontend sends the token with protected requests.
+
+authMiddleware verifies the token.
+
+Example authorization header:
+
+Authorization: Bearer YOUR_JWT_TOKEN
+
+You have already worked with JWT authentication in your user-auth-api project, so this flow will be familiar.
+
+5. Attendance Marking Flow
+
+This explains the internal process when a teacher marks attendance.
+
+Teacher selects Lecture 1 and a date.
+Frontend displays the student list.
+Teacher selects Present or Absent.
+Frontend sends the attendance data to the backend.
+JWT middleware verifies the teacher.
+Backend validates the student, lecture, and attendance status.
+Database saves the attendance record.
+Backend sends a response to the frontend.
+6. Attendance Percentage
+
+The LLD explains how to calculate attendance.
+
+Formula:
+
+Attendance Percentage=
+Total Marked Lectures
+Present Lectures
+	​
+
+×100
+
+Example:
+
+Total marked lectures = 10
+
+Present lectures = 8
+
+10
+8
+	​
+
+×100=80%
+
+The system should not count future or unmarked lectures as absent.
+
+7. Middleware
+
+The LLD defines the responsibilities of middleware.
+
+Middleware
+
+	
+
+Purpose
+
+
+
+
+authMiddleware
+
+	
+
+Verifies JWT
+
+
+
+
+roleMiddleware
+
+	
+
+Checks student/teacher permissions
+
+
+
+
+Validation
+
+	
+
+Checks request data
+
+Example
+
+A student tries to mark attendance.
+
+Request reaches the backend.
+
+JWT is verified.
+
+Role is checked.
+
+Student is denied because only teachers can mark attendance.
+
+The backend should return 403 Forbidden for an authenticated user without the required permission.
+
+8. Error Responses
+
+LLD also defines common HTTP errors.
+
+Status
+
+	
+
+Meaning
+
+
+
+
+400
+
+	
+
+Invalid request
+
+
+
+
+401
+
+	
+
+Missing or invalid token
+
+
+
+
+403
+
+	
+
+Not authorized
+
+
+
+
+404
+
+	
+
+Record not found
+
+
+
+
+409
+
+	
+
+Duplicate record
+
+
+
+
+500
+
+	
+
+Server error
+
+Example:
+
+If a student tries to access a teacher-only attendance-marking API, the backend should return 403.
+
+9. Frontend Pages
+
+The LLD includes the pages we need to build in React.
+
+Login Page
+
+Student and teacher login.
+
+Teacher Dashboard
+
+View daily lectures and attendance actions.
+
+Mark Attendance
+
+Select students as Present or Absent.
+
+Attendance Report
+
+View attendance summaries and filters.
+
+Student Dashboard
+
+View lecture-wise attendance and percentage.
+
+10. Implementation Order
+
+The LLD contains the order in which we will build the system.
+
+Create project folders.
+Set up the Express backend.
+Set up MySQL using Docker.
+Create database and tables.
+Implement signup and signin.
+Implement JWT authentication.
+Create lecture schedule API.
+Create teacher attendance API.
+Create student attendance API.
+Build React login page.
+Build teacher dashboard.
+Build attendance marking page.
+Build student dashboard.
+Test the complete workflow.
+HLD vs LLD — Interview Answer
+
+HLD
+
+	
+
+LLD
+
+
+
+
+Overall system architecture
+
+	
+
+Detailed implementation
+
+
+
+
+Major components
+
+	
+
+Files, tables, APIs
+
+
+
+
+Frontend, backend, database
+
+	
+
+Controllers, middleware, SQL
+
+
+
+
+Explains how components connect
+
+	
+
+Explains how each feature works
+
+Simple interview answer:
+
+HLD describes the overall architecture of my attendance management system, including the frontend, backend, and database. LLD describes the implementation details, such as the folder structure, database tables, API endpoints, middleware, and attendance workflows. HLD explains the big picture, while LLD explains how I will build each component.

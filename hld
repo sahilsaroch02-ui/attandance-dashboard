@@ -1,0 +1,248 @@
+1. Project Overview
+
+This section explains what your application does.
+
+Your system is a college attendance application where:
+
+Teachers mark attendance for students.
+
+Students view their attendance.
+
+Attendance is organized by Lecture 1, Lecture 2, Lecture 3, etc.
+
+The backend stores attendance in MySQL.
+
+Example:
+
+A teacher marks Sahil as Present in Lecture 1. The system saves the record in the database, and Sahil can later view it from his dashboard.
+
+2. Requirements
+
+This section defines what the application needs to do.
+
+Requirement
+
+	
+
+Description
+
+
+
+
+Student
+
+	
+
+Can log in and view attendance
+
+
+
+
+Teacher
+
+	
+
+Can log in and mark attendance
+
+
+
+
+Lectures
+
+	
+
+Fixed daily schedule
+
+
+
+
+Attendance
+
+	
+
+Present / Absent
+
+
+
+
+Database
+
+	
+
+MySQL
+
+
+
+
+Backend
+
+	
+
+Node.js + Express.js
+
+
+
+
+Frontend
+
+	
+
+React.js
+
+3. System Architecture
+
+This explains how the different parts of the application communicate.
+
+React Frontend
+
+Student & Teacher Interface
+
+Node.js + Express.js
+
+Routes, Controllers, Middleware
+
+MySQL Database
+
+Running inside Docker
+
+Example of how a request works
+
+Teacher clicks Save Attendance in React.
+
+React sends an API request to Express.
+
+Express checks the teacher's authentication and permissions.
+
+Backend saves the attendance in MySQL.
+
+Backend sends a response to React.
+
+React displays a success message.
+
+This is called the system architecture.
+
+4. Main Modules
+
+The HLD describes the main features of the application.
+
+Authentication
+
+Login and password verification for students and teachers.
+
+Lecture Schedule
+
+Stores Lecture 1, Lecture 2, timings, and daily schedule.
+
+Attendance Management
+
+Allows teachers to mark and update student attendance.
+
+Student & Teacher Dashboards
+
+Displays relevant attendance information and actions for each role.
+
+5. User Workflows
+
+The HLD explains how each user interacts with the application.
+
+Teacher workflow
+Teacher logs in.
+Teacher opens the dashboard.
+Teacher selects Lecture 1.
+Teacher sees the student list.
+Teacher marks Present or Absent.
+Attendance is saved in MySQL.
+Student workflow
+Student logs in.
+Student opens the attendance dashboard.
+Student views Lecture 1, Lecture 2, and other lectures.
+Student sees attendance status and percentage.
+6. Security Design
+
+This section explains how we protect the application.
+
+bcrypt: Passwords are stored as hashes rather than plain text.
+
+JWT: Authenticates logged-in users.
+
+Role-based access: Only teachers can mark attendance.
+
+Validation: Checks incoming data.
+
+Parameterized SQL queries: Helps protect against SQL injection.
+
+Example:
+
+A student should not be able to call the teacher's attendance-marking API successfully just by sending a request.
+
+7. Deployment
+
+This section explains where the application components run.
+
+Component
+
+	
+
+Where it runs
+
+
+
+
+React
+
+	
+
+Frontend application
+
+
+
+
+Node.js
+
+	
+
+Backend server
+
+
+
+
+MySQL
+
+	
+
+Docker container
+
+
+
+
+Database volume
+
+	
+
+Persistent database storage
+
+Docker runs the MySQL database in a container. A persistent volume helps retain data when the container is recreated.
+
+8. Future Enhancements
+
+The HLD also mentions features we can add later:
+
+Admin role.
+
+Class and semester management.
+
+Attendance correction requests.
+
+CSV/PDF reports.
+
+Low-attendance notifications.
+
+Audit logs.
+
+These are planned enhancements, not features we must implement immediately.
+
+Simple interview answer
+
+Question: What is the HLD of your Attendance Management System?
+
+HLD, or High-Level Design, describes the overall architecture of my College Attendance Management System. The frontend is built using React.js, the backend uses Node.js and Express.js, and MySQL runs inside Docker. Teachers can mark attendance for scheduled lectures, while students can view their lecture-wise attendance and percentage. The backend handles authentication, authorization, attendance APIs, and communication with the database.

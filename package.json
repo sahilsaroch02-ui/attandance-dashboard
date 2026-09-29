@@ -1,0 +1,13 @@
+{
+  "name": "attendance-management-system",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\" \"wait-on http://localhost:5174 && open http://localhost:5174\"",
+    "backend": "npm --prefix backend start",
+    "frontend": "npm --prefix frontend run dev"
+  },
+  "devDependencies": {
+    "concurrently": "latest",
+    "wait-on": "latest"
+  }
+}
